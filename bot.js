@@ -7,7 +7,7 @@ const fetch = require("node-fetch");
 const opts = {
   identity: {
     username: "twitchtradesstocks",
-    password: "oauth:g9gxyfv1g8uagih242evn5dotwuw00"
+    password: "oauth:0muh8mc6n52jkec8jqidu4btqy4000"
   },
   channels: [
     "twitchtradesstocks"
