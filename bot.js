@@ -1,6 +1,7 @@
 const tmi = require('tmi.js');
 const fs = require("fs")
 const https = require("https")
+const fetch = require("node-fetch");
 
 // Define configuration options
 const opts = {
@@ -13,6 +14,8 @@ const opts = {
   ]
 };
 
+const VOTES = [];
+
 // Create a client with our options
 const client = new tmi.client(opts);
 
@@ -23,8 +26,30 @@ client.on('connected', onConnectedHandler);
 // Connect to Twitch:
 client.connect();
 
+// const TIMER_CAP = 10000;
+// 
+// var MILLIS_UNTIL_SUBMIT_VOTES = TIMER_CAP;
+// 
+//
+setInterval(submitVotes, 60000);
+
+function say(s) {
+    console.log(`Sent string to channel: ${s}`);
+    client.say("#twitchtradesstocks", s);
+}
+
+function submitVotes() {
+    fetch("/submitVotes", {
+        body: JSON.stringify(VOTES),
+        method: "POST"
+    });
+    say("Submitted votes.");
+    clearVotes();
+}
+
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
+    console.log(target);
     if (self) { return; } // Ignore messages from the bot
 
     // Remove whitespace from chat message
@@ -46,18 +71,28 @@ function onMessageHandler (target, context, msg, self) {
         if (allCommandArgs.length > 1) {
             var stockName = allCommandArgs[1];
             console.log(`Buying ${stockName}`);
+            voteForStock(stockName);
             // Dispatch
         } else {
             console.log("Not enough arguments provided for buy command");
         }
-    }
-    else {
+    } else if (commandName == "!debug") {
+        client.say(target, `Current state of votes: ${VOTES}`);
+    } else if (commandName == "!clearVotes") {
+        clientVotes();
+    } else {
         console.log(`* Unknown command ${commandName}`);
     }
 }
 
-function buyStock(ticker) {
-    // Get most recent closing price for the ticker
+function voteForStock(stockName) {
+    VOTES.push(stockName);
+}
+
+function clearVotes() {
+    while(VOTES.length > 0) {
+        VOTES.pop();
+    }
 }
 
 // Function called when the "dice" command is issued
