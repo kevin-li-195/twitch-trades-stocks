@@ -39,12 +39,22 @@ function say(s) {
 }
 
 function submitVotes() {
-    fetch("/submitVotes", {
+    fetch("http://localhost:8888/submitVotes", {
         body: JSON.stringify(VOTES),
         method: "POST"
     });
     say("Submitted votes.");
     clearVotes();
+}
+
+function buy(s, a) {
+	fetch("http://localhost:8888/buy", {
+		method: "POST",
+		body: JSON.stringify({
+			"ticker": s,
+			"amount": a
+		})
+	})
 }
 
 // Called every time a message comes in
@@ -68,10 +78,12 @@ function onMessageHandler (target, context, msg, self) {
         client.say(target, `You rolled a ${num}`);
         console.log(`* Executed ${commandName} command`);
     } else if (commandName == "!buy") {
-        if (allCommandArgs.length > 1) {
+        if (allCommandArgs.length > 2) {
             var stockName = allCommandArgs[1];
-            console.log(`Buying ${stockName}`);
-            voteForStock(stockName);
+            var amount = parseInt(allCommandArgs[2]);
+            console.log(`Buying ${amount} shares of ${stockName}`);
+	    buy(stockName, amount);
+            // voteForStock(stockName);
             // Dispatch
         } else {
             console.log("Not enough arguments provided for buy command");

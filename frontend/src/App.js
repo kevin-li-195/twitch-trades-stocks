@@ -1,21 +1,40 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
-}
+const App = () => {
+	const [portfolio, setPortfolio] = useState({});
 
+	const getPortfolio = () => {
+		fetch("/getPortfolio")
+			.then(r => r.json())
+			.then(setPortfolio);
+	};
+
+	const buyAMD = () => {
+		return fetch("/buy", {
+			method: "POST",
+			body: JSON.stringify({
+				"ticker":"AMD",
+				"amount":421
+			})
+		}).then(console.log)
+	};
+
+	setInterval(getPortfolio, 3000);
+
+	return(
+		<div>
+			<h1>Xx STONKS xX</h1>
+			<p style={{"color": "red"}}>Hello world!</p>
+			<ul>
+			{
+				Object.keys(portfolio).map(ticker => (
+					<li key={ticker}>{ticker} - {portfolio[ticker]} shares</li>
+				))
+			}
+			</ul>
+		</div>
+	)
+}
 export default App;
